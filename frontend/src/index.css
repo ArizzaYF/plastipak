@@ -1,0 +1,14 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f0f23; color: #ccd6f6; }
+a { color: inherit; }
+input, select, textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #ccd6f6;
+  padding: 10px 14px;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 0.95rem;
+}
+input:focus, select:focus { outline: none; border-color: #e94560; }
+button { cursor: pointer; font-size: 0.95rem; }
