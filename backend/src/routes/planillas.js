@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { getPlanillas, crearPlanilla } = require('../controllers/planillas.controller');
-router.get('/', getPlanillas);
-router.post('/', crearPlanilla);
+const auth = require('../middleware/auth');
+router.get('/', auth, getPlanillas);
+router.post('/', auth, crearPlanilla);
 module.exports = router;

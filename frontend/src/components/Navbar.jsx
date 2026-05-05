@@ -1,54 +1,80 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+const navLinks = {
+  vendedor: [
+    { to: '/dashboard', label: 'INICIO' },
+    { to: '/referencias', label: 'REFERENCIAS' },
+    { to: '/pedidos', label: 'PEDIDOS' },
+  ],
+  jefe_produccion: [
+    { to: '/dashboard', label: 'INICIO' },
+    { to: '/referencias', label: 'REFERENCIAS' },
+    { to: '/planillas', label: 'PLANILLAS' },
+    { to: '/reporte', label: 'REPORTES' },
+  ],
+  operario: [
+    { to: '/dashboard', label: 'INICIO' },
+    { to: '/registro', label: 'REGISTRO' },
+  ],
+};
 
 const Navbar = () => {
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const location = useLocation();
+  const links = navLinks[usuario?.rol] || [];
 
   return (
-    <nav style={styles.nav}>
-      <span style={styles.brand}>🏭 PlastiPak</span>
-      <div style={styles.links}>
-        <Link to="/dashboard" style={styles.link}>Dashboard</Link>
-        {(usuario?.rol === 'vendedor' || usuario?.rol === 'jefe_produccion') && (
-          <Link to="/referencias" style={styles.link}>Referencias</Link>
-        )}
-        {usuario?.rol === 'vendedor' && (
-          <Link to="/pedidos" style={styles.link}>Pedidos</Link>
-        )}
-        {usuario?.rol === 'jefe_produccion' && (
-          <Link to="/planillas" style={styles.link}>Planillas</Link>
-        )}
-        {usuario?.rol === 'operario' && (
-          <Link to="/registro" style={styles.link}>Registro</Link>
-        )}
-        {usuario?.rol === 'jefe_produccion' && (
-          <Link to="/reporte" style={styles.link}>Reportes</Link>
-        )}
+    <nav style={s.nav}>
+      <div style={s.left}>
+        <div style={s.logo}>
+          <span style={s.logoIcon}>◈</span>
+          <span style={s.logoText}>PLASTI<span style={s.acc}>PAK</span></span>
+        </div>
+        <div style={s.sep}/>
+        <div style={s.links}>
+          {links.map(l => (
+            <Link key={l.to} to={l.to} style={{
+              ...s.link,
+              ...(location.pathname === l.to ? s.linkActive : {})
+            }}>
+              {l.label}
+              {location.pathname === l.to && <span style={s.linkBar}/>}
+            </Link>
+          ))}
+        </div>
       </div>
-      <div style={styles.user}>
-        <span style={styles.rolBadge}>{usuario?.rol}</span>
-        <span style={styles.nombre}>{usuario?.nombre}</span>
-        <button onClick={handleLogout} style={styles.btn}>Salir</button>
+      <div style={s.right}>
+        <div style={s.userInfo}>
+          <span style={s.rolTag}>{usuario?.rol?.replace('_',' ').toUpperCase()}</span>
+          <span style={s.userName}>{usuario?.nombre}</span>
+        </div>
+        <button onClick={() => { logout(); navigate('/login'); }} style={s.btn}>
+          SALIR
+        </button>
       </div>
     </nav>
   );
 };
 
-const styles = {
-  nav: { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 24px', background:'#1a1a2e', color:'#fff' },
-  brand: { fontSize:'1.2rem', fontWeight:'bold', color:'#e94560' },
-  links: { display:'flex', gap:'20px' },
-  link: { color:'#a8b2d8', textDecoration:'none', fontSize:'0.95rem' },
-  user: { display:'flex', alignItems:'center', gap:'12px' },
-  rolBadge: { background:'#e94560', padding:'2px 8px', borderRadius:'12px', fontSize:'0.75rem' },
-  nombre: { fontSize:'0.9rem', color:'#ccd6f6' },
-  btn: { background:'transparent', border:'1px solid #e94560', color:'#e94560', padding:'4px 12px', borderRadius:'6px', cursor:'pointer' }
+const s = {
+  nav:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 32px',height:'56px',background:'var(--bg-panel)',borderBottom:'1px solid var(--border)',position:'sticky',top:0,zIndex:100},
+  left:{display:'flex',alignItems:'center',gap:'0'},
+  logo:{display:'flex',alignItems:'center',gap:'10px',marginRight:'24px'},
+  logoIcon:{color:'var(--accent)',fontSize:'1.1rem'},
+  logoText:{fontFamily:'var(--font-display)',fontSize:'1.1rem',fontWeight:'700',letterSpacing:'0.15em'},
+  acc:{color:'var(--accent)'},
+  sep:{width:'1px',height:'20px',background:'var(--border)',margin:'0 24px'},
+  links:{display:'flex',alignItems:'center',gap:'4px'},
+  link:{fontFamily:'var(--font-mono)',fontSize:'0.7rem',letterSpacing:'0.12em',color:'var(--text-muted)',padding:'8px 14px',borderRadius:'3px',position:'relative',transition:'color 0.2s'},
+  linkActive:{color:'var(--accent)'},
+  linkBar:{position:'absolute',bottom:'-17px',left:'14px',right:'14px',height:'2px',background:'var(--accent)',borderRadius:'1px'},
+  right:{display:'flex',alignItems:'center',gap:'16px'},
+  userInfo:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'2px'},
+  rolTag:{fontFamily:'var(--font-mono)',fontSize:'0.6rem',color:'var(--accent)',letterSpacing:'0.1em'},
+  userName:{fontFamily:'var(--font-mono)',fontSize:'0.75rem',color:'var(--text-secondary)'},
+  btn:{background:'transparent',border:'1px solid var(--border)',color:'var(--text-muted)',padding:'6px 14px',borderRadius:'3px',fontFamily:'var(--font-mono)',fontSize:'0.68rem',letterSpacing:'0.1em',transition:'border-color 0.2s, color 0.2s'}
 };
 
 export default Navbar;
