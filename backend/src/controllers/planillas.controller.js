@@ -3,7 +3,10 @@ const Planilla = require('../models/Planilla');
 exports.getPlanillas = async (req, res) => {
   try {
     const planillas = await Planilla.find()
-      .populate('pedidos')
+      .populate({
+        path: 'pedidos',
+        populate: { path: 'items.referencia', select: 'codigo nombre' }
+      })
       .populate('creadoPor', 'nombre');
     res.json(planillas);
   } catch (err) {

@@ -1,74 +1,109 @@
 import { useState } from 'react';
 import api from '../services/api';
 
+const fmtFecha = (d) => d ? new Date(d).toLocaleString('es-CO', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+const hoy = () => new Date().toISOString().split('T')[0];
+
 const Reporte = () => {
   const [reporte, setReporte] = useState(null);
-  const [form, setForm] = useState({ fecha:'', turno:'manana' });
+  const [form, setForm] = useState({ fecha: hoy(), turno:'manana' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleBuscar = async (e) => {
     e.preventDefault();
+    if (!form.fecha) { setError('Debes seleccionar una fecha válida'); return; }
+    setError('');
     setLoading(true);
     try {
       const { data } = await api.get(`/reportes/turno?fecha=${form.fecha}&turno=${form.turno}`);
       setReporte(data);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch(err) { setError('Error al generar el reporte'); }
     setLoading(false);
   };
 
-  const totalBolsas = reporte?.reporte?.reduce((acc, r) => acc + (r.cantidadBolsas || 0), 0) || 0;
-  const totalDesperdicios = reporte?.reporte?.reduce((acc, r) => acc + (r.pesoDesperdicios || 0), 0) || 0;
+  const totalBolsas = reporte?.reporte?.reduce((a,r) => a + (r.cantidadBolsas || 0), 0) || 0;
+  const totalDesp = reporte?.reporte?.reduce((a,r) => a + (r.pesoDesperdicios || 0), 0) || 0;
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>📊 Reporte por Turno</h2>
-      <form onSubmit={handleBuscar} style={styles.form}>
-        <div style={styles.grid2}>
-          <div style={styles.field}>
-            <label style={styles.label}>Fecha</label>
-            <input type="date" value={form.fecha} onChange={e => setForm({...form,fecha:e.target.value})} required />
-          </div>
-          <div style={styles.field}>
-            <label style={styles.label}>Turno</label>
-            <select value={form.turno} onChange={e => setForm({...form,turno:e.target.value})}>
-              <option value="manana">Mañana</option>
-              <option value="tarde">Tarde</option>
-              <option value="noche">Noche</option>
-            </select>
-          </div>
+    <div style={s.page}>
+      <div style={s.header}>
+        <div>
+          <span style={s.tag}>// JEFE DE PRODUCCIÓN</span>
+          <h2 style={s.title}>REPORTE POR TURNO</h2>
+          <div style={s.underline}/>
         </div>
-        <button type="submit" style={styles.btnPrimary}>{loading ? 'Cargando...' : '🔍 Generar Reporte'}</button>
-      </form>
+      </div>
+
+      <div style={s.formCard}>
+        <h3 style={s.formTitle}>PARÁMETROS DEL REPORTE</h3>
+        <form onSubmit={handleBuscar} style={s.form}>
+          <div style={s.grid2}>
+            <div style={s.field}>
+              <label style={s.label}>FECHA (selecciona el día a consultar)</label>
+              <input
+                type="date"
+                value={form.fecha}
+                max={hoy()}
+                onChange={e => setForm({...form, fecha:e.target.value})}
+                required
+              />
+            </div>
+            <div style={s.field}>
+              <label style={s.label}>TURNO</label>
+              <select value={form.turno} onChange={e => setForm({...form, turno:e.target.value})}>
+                <option value="manana">Mañana</option>
+                <option value="tarde">Tarde</option>
+                <option value="noche">Noche</option>
+              </select>
+            </div>
+          </div>
+          {error && <div style={s.error}>⚠ {error}</div>}
+          <button type="submit" className="neo-btn-primary" style={{alignSelf:'flex-start'}} disabled={loading}>
+            {loading ? 'GENERANDO...' : '▶ GENERAR REPORTE'}
+          </button>
+        </form>
+      </div>
+
       {reporte && (
         <>
-          <div style={styles.resumen}>
-            <div style={styles.stat}><span style={styles.statNum}>{reporte.reporte?.length}</span><span style={styles.statLabel}>Registros</span></div>
-            <div style={styles.stat}><span style={styles.statNum}>{totalBolsas.toLocaleString()}</span><span style={styles.statLabel}>Bolsas Producidas</span></div>
-            <div style={styles.stat}><span style={styles.statNum}>{totalDesperdicios} kg</span><span style={styles.statLabel}>Desperdicios</span></div>
+          <div style={s.statsRow}>
+            {[
+              {label:'REGISTROS TOTALES', value: reporte.reporte?.length, color:'var(--accent)'},
+              {label:'BOLSAS PRODUCIDAS', value: totalBolsas.toLocaleString(), color:'var(--success)'},
+              {label:'TOTAL DESPERDICIOS', value: `${totalDesp} kg`, color:'var(--warning)'},
+            ].map(st => (
+              <div key={st.label} style={s.statCard}>
+                <span style={{...s.statValue, color:st.color}}>{st.value}</span>
+                <span style={s.statLabel}>{st.label}</span>
+              </div>
+            ))}
           </div>
-          <div style={styles.tabla}>
-            <table style={styles.table}>
+
+          <span style={s.sectionTag}>// DETALLE POR SELLADORA Y OPERARIO</span>
+          <div style={s.tableWrap}>
+            <table style={s.table}>
               <thead>
-                <tr>{['Selladora','Operario','Referencia','Rollo','Inicio','Fin','Bolsas','Desperdicio'].map(h => <th key={h} style={styles.th}>{h}</th>)}</tr>
+                <tr>{['SELLADORA','OPERARIO','REFERENCIA','ROLLO','INICIO PRODUCCIÓN','FIN PRODUCCIÓN','BOLSAS','DESPERDICIO'].map(h => <th key={h} style={s.th}>{h}</th>)}</tr>
               </thead>
               <tbody>
+                {reporte.reporte?.length === 0 && (
+                  <tr><td colSpan={8} style={s.empty}>No hay registros para este turno y fecha</td></tr>
+                )}
                 {reporte.reporte?.map((r, i) => (
-                  <tr key={i} style={styles.tr}>
-                    <td style={styles.td}>S{r.selladora}</td>
-                    <td style={styles.td}>{r.operario || '-'}</td>
-                    <td style={styles.td}>{r.referencia || '-'}</td>
-                    <td style={styles.td}>{r.numeroRollo}</td>
-                    <td style={styles.td}>{r.horaInicio ? new Date(r.horaInicio).toLocaleTimeString() : '-'}</td>
-                    <td style={styles.td}>{r.horaFin ? new Date(r.horaFin).toLocaleTimeString() : '-'}</td>
-                    <td style={styles.td}>{r.cantidadBolsas ?? '-'}</td>
-                    <td style={styles.td}>{r.pesoDesperdicios ?? '-'} kg</td>
+                  <tr key={i} style={s.tr}>
+                    <td style={s.tdAccent}>SELLADORA {r.selladora}</td>
+                    <td style={s.td}>{r.operario || '—'}</td>
+                    <td style={s.tdMono}>{r.referencia || '—'}</td>
+                    <td style={s.tdMono}>{r.numeroRollo}</td>
+                    <td style={s.td}>{fmtFecha(r.horaInicio)}</td>
+                    <td style={s.td}>{fmtFecha(r.horaFin)}</td>
+                    <td style={s.tdMono}>{r.cantidadBolsas ?? '—'}</td>
+                    <td style={s.tdMono}>{r.pesoDesperdicios != null ? `${r.pesoDesperdicios} kg` : '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {reporte.reporte?.length === 0 && <p style={styles.empty}>No hay registros para este turno</p>}
           </div>
         </>
       )}
@@ -76,20 +111,32 @@ const Reporte = () => {
   );
 };
 
-const styles = {
-  container:{padding:'40px'}, title:{color:'#ccd6f6',fontSize:'1.5rem',marginBottom:'24px'},
-  form:{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'24px',marginBottom:'32px',display:'flex',flexDirection:'column',gap:'16px'},
+const s = {
+  page:{padding:'40px',maxWidth:'1400px'},
+  header:{marginBottom:'32px'},
+  tag:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'var(--accent)',letterSpacing:'0.15em',display:'block',marginBottom:'6px'},
+  title:{fontFamily:'var(--font-display)',fontSize:'1.8rem',fontWeight:'700',letterSpacing:'0.08em'},
+  underline:{height:'3px',width:'40px',background:'var(--accent)',marginTop:'8px'},
+  formCard:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'6px 6px 0 var(--border-dim)',padding:'28px',marginBottom:'32px',borderRadius:'2px'},
+  formTitle:{fontFamily:'var(--font-mono)',fontSize:'0.8rem',color:'var(--accent)',letterSpacing:'0.15em',marginBottom:'20px'},
+  form:{display:'flex',flexDirection:'column',gap:'20px'},
   grid2:{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'16px'},
-  field:{display:'flex',flexDirection:'column',gap:'6px'}, label:{fontSize:'0.8rem',color:'#8892b0'},
-  btnPrimary:{background:'#e94560',color:'#fff',border:'none',padding:'10px 20px',borderRadius:'8px',fontWeight:'bold',alignSelf:'flex-start'},
-  resumen:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px',marginBottom:'24px'},
-  stat:{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'20px',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'},
-  statNum:{color:'#e94560',fontSize:'1.8rem',fontWeight:'bold'},
-  statLabel:{color:'#8892b0',fontSize:'0.85rem'},
-  tabla:{background:'rgba(255,255,255,0.03)',borderRadius:'12px',overflow:'auto'},
-  table:{width:'100%',borderCollapse:'collapse'}, th:{padding:'12px 16px',textAlign:'left',color:'#e94560',fontSize:'0.85rem',borderBottom:'1px solid rgba(255,255,255,0.1)'},
-  tr:{borderBottom:'1px solid rgba(255,255,255,0.05)'}, td:{padding:'12px 16px',color:'#a8b2d8',fontSize:'0.9rem'},
-  empty:{textAlign:'center',padding:'40px',color:'#8892b0'}
+  field:{display:'flex',flexDirection:'column',gap:'6px'},
+  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.15em'},
+  error:{padding:'10px 14px',border:'2px solid var(--danger)',background:'rgba(220,38,38,0.1)',color:'#fca5a5',fontFamily:'var(--font-mono)',fontSize:'0.78rem',borderRadius:'2px'},
+  statsRow:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px',marginBottom:'32px'},
+  statCard:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'5px 5px 0 var(--border-dim)',padding:'24px',display:'flex',flexDirection:'column',gap:'8px',borderRadius:'2px'},
+  statValue:{fontFamily:'var(--font-display)',fontSize:'2.2rem',fontWeight:'700',lineHeight:1},
+  statLabel:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.15em'},
+  sectionTag:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'var(--text-muted)',letterSpacing:'0.15em',display:'block',marginBottom:'14px'},
+  tableWrap:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'6px 6px 0 var(--border-dim)',borderRadius:'2px',overflow:'auto'},
+  table:{width:'100%',borderCollapse:'collapse'},
+  th:{padding:'12px 16px',textAlign:'left',fontFamily:'var(--font-mono)',fontSize:'0.62rem',color:'var(--accent)',letterSpacing:'0.1em',borderBottom:'2px solid var(--border-dim)',background:'#0d0f13',whiteSpace:'nowrap'},
+  tr:{borderBottom:'1px solid var(--border-dim)'},
+  td:{padding:'12px 16px',color:'var(--text-secondary)',fontSize:'0.82rem',whiteSpace:'nowrap'},
+  tdMono:{padding:'12px 16px',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:'0.78rem',whiteSpace:'nowrap'},
+  tdAccent:{padding:'12px 16px',color:'var(--accent)',fontFamily:'var(--font-mono)',fontSize:'0.78rem',fontWeight:'700',whiteSpace:'nowrap'},
+  empty:{textAlign:'center',padding:'40px',color:'var(--text-muted)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
 };
 
 export default Reporte;
