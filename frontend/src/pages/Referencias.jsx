@@ -132,18 +132,18 @@ const s = {
   form:{display:'flex',flexDirection:'column',gap:'16px'},
   grid:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:'16px'},
   field:{display:'flex',flexDirection:'column',gap:'6px'},
-  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.15em'},
+  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'#cccccc',letterSpacing:'0.15em'},
   tableWrap:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'6px 6px 0 var(--border-dim)',borderRadius:'2px',overflow:'auto'},
   table:{width:'100%',borderCollapse:'collapse'},
   th:{padding:'12px 16px',textAlign:'left',fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--accent)',letterSpacing:'0.12em',borderBottom:'2px solid var(--border-dim)',background:'#0d0f13'},
   tr:{borderBottom:'1px solid var(--border-dim)'},
-  td:{padding:'12px 16px',color:'var(--text-secondary)',fontSize:'0.88rem'},
+  td:{padding:'12px 16px',color:'#ffffff',fontSize:'0.88rem'},
   tdMono:{padding:'12px 16px',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
-  badge:{border:'1px solid var(--border-dim)',padding:'2px 8px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-secondary)',borderRadius:'2px'},
+  badge:{border:'1px solid var(--border-dim)',padding:'2px 8px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'#ffffff',borderRadius:'2px'},
   acciones:{display:'flex',gap:'8px'},
   btnEdit:{background:'transparent',border:'2px solid var(--accent)',color:'var(--accent)',padding:'4px 10px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',fontWeight:'700',borderRadius:'2px',boxShadow:'2px 2px 0 var(--accent)',cursor:'pointer'},
   btnDel:{background:'transparent',border:'2px solid var(--danger)',color:'var(--danger)',padding:'4px 10px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',fontWeight:'700',borderRadius:'2px',boxShadow:'2px 2px 0 var(--danger)',cursor:'pointer'},
-  empty:{textAlign:'center',padding:'40px',color:'var(--text-muted)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
+  empty:{textAlign:'center',padding:'40px',color:'#cccccc',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
 };
 
 export default Referencias;

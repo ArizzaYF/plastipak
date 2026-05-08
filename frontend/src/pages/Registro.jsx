@@ -8,11 +8,23 @@ const Modal = ({ registro, cantidadPedida, onConfirm, onCancel }) => {
   const [desperdicio, setDesperdicio] = useState('');
   const [error, setError] = useState('');
 
+  const handleChangeBolsas = (val) => {
+    const limpio = val.replace(/[^0-9]/g, '');
+    if (cantidadPedida && parseInt(limpio) > cantidadPedida) {
+      setError(`No puedes reportar más bolsas de las pedidas (máximo ${cantidadPedida})`);
+      setBolsas(String(cantidadPedida));
+      return;
+    }
+    setError('');
+    setBolsas(limpio);
+  };
+
   const handleConfirm = () => {
     const b = parseInt(bolsas);
     const d = parseFloat(desperdicio);
-    if (!bolsas || isNaN(b) || b <= 0 || !Number.isInteger(b)) { setError('Las bolsas deben ser un número entero mayor a 0'); return; }
-    if (desperdicio === '' || isNaN(d) || d < 0) { setError('El desperdicio debe ser 0 o mayor (puede usar decimales, ej: 1.5)'); return; }
+    if (!bolsas || isNaN(b) || b <= 0) { setError('Las bolsas deben ser un número entero mayor a 0'); return; }
+    if (cantidadPedida && b > cantidadPedida) { setError(`Máximo ${cantidadPedida} bolsas`); return; }
+    if (desperdicio === '' || isNaN(d) || d < 0) { setError('El desperdicio debe ser 0 o mayor'); return; }
     onConfirm(b, d);
   };
 
@@ -21,24 +33,26 @@ const Modal = ({ registro, cantidadPedida, onConfirm, onCancel }) => {
       <div style={m.modal}>
         <h3 style={m.title}>FINALIZAR PRODUCCIÓN</h3>
         <div style={m.info}>
-          <p style={m.infoLine}><span style={m.infoKey}>SELLADORA</span>{registro.selladora}</p>
-          <p style={m.infoLine}><span style={m.infoKey}>REFERENCIA</span>{registro.referencia?.codigo}</p>
-          <p style={m.infoLine}><span style={m.infoKey}>ROLLO</span>{registro.numeroRollo}</p>
+          <p style={m.infoLine}><span style={m.infoKey}>SELLADORA</span><span style={m.infoVal}>{registro.selladora}</span></p>
+          <p style={m.infoLine}><span style={m.infoKey}>REFERENCIA</span><span style={m.infoVal}>{registro.referencia?.codigo}</span></p>
+          <p style={m.infoLine}><span style={m.infoKey}>ROLLO</span><span style={m.infoVal}>{registro.numeroRollo}</span></p>
           {cantidadPedida && <p style={m.infoLine}><span style={m.infoKey}>PEDIDO SOLICITÓ</span><strong style={{color:'var(--accent)'}}>{cantidadPedida} bolsas</strong></p>}
         </div>
         <div style={m.fields}>
           <div style={m.field}>
-            <label style={m.label}>BOLSAS PRODUCIDAS (solo números enteros)</label>
+            <label style={m.label}>BOLSAS PRODUCIDAS {cantidadPedida ? `(máximo ${cantidadPedida})` : '(solo números enteros)'}</label>
             <input
               type="number" min="1" step="1"
+              max={cantidadPedida || undefined}
               value={bolsas}
-              onChange={e => setBolsas(e.target.value.replace(/[^0-9]/g,''))}
-              placeholder="Ej: 850"
-              style={m.input} autoFocus
+              onChange={e => handleChangeBolsas(e.target.value)}
+              placeholder={cantidadPedida ? `Máximo ${cantidadPedida}` : 'Ej: 850'}
+              style={m.input}
+              autoFocus
             />
-            {cantidadPedida && bolsas && (
-              <span style={{...m.hint, color: parseInt(bolsas) >= cantidadPedida ? 'var(--success)' : 'var(--warning)'}}>
-                {parseInt(bolsas) >= cantidadPedida ? '✓ Pedido completado' : `⚠ Faltan ${cantidadPedida - parseInt(bolsas)} bolsas`}
+            {cantidadPedida && bolsas && parseInt(bolsas) <= cantidadPedida && (
+              <span style={{...m.hint, color: parseInt(bolsas) === cantidadPedida ? 'var(--success)' : 'var(--warning)'}}>
+                {parseInt(bolsas) === cantidadPedida ? '✓ Pedido completado exactamente' : `⚠ Faltan ${cantidadPedida - parseInt(bolsas)} bolsas del pedido`}
               </span>
             )}
           </div>
@@ -68,16 +82,17 @@ const m = {
   modal:{background:'var(--bg-card)',border:'2px solid var(--accent)',boxShadow:'8px 8px 0 var(--accent)',padding:'32px',width:'100%',maxWidth:'480px',borderRadius:'2px'},
   title:{fontFamily:'var(--font-display)',fontSize:'1.2rem',fontWeight:'700',color:'var(--accent)',letterSpacing:'0.1em',marginBottom:'20px'},
   info:{background:'#0d0f13',border:'1px solid var(--border-dim)',padding:'16px',borderRadius:'2px',marginBottom:'20px',display:'flex',flexDirection:'column',gap:'8px'},
-  infoLine:{fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'var(--text-secondary)',display:'flex',gap:'12px'},
-  infoKey:{color:'var(--text-muted)',minWidth:'130px'},
+  infoLine:{fontFamily:'var(--font-mono)',fontSize:'0.78rem',display:'flex',gap:'12px',alignItems:'center'},
+  infoKey:{color:'#ffffff',minWidth:'130px',fontWeight:'600'},
+  infoVal:{color:'#ffffff'},
   fields:{display:'flex',flexDirection:'column',gap:'16px',marginBottom:'16px'},
   field:{display:'flex',flexDirection:'column',gap:'6px'},
-  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.1em'},
-  input:{fontFamily:'var(--font-mono)',fontSize:'0.9rem',background:'#0d0f13',border:'2px solid var(--border-dim)',color:'var(--text)',padding:'10px 14px',borderRadius:'2px',width:'100%'},
+  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'#ffffff',letterSpacing:'0.1em',fontWeight:'600'},
+  input:{fontFamily:'var(--font-mono)',fontSize:'0.9rem',background:'#0d0f13',border:'2px solid var(--border-dim)',color:'#ffffff',padding:'10px 14px',borderRadius:'2px',width:'100%'},
   hint:{fontFamily:'var(--font-mono)',fontSize:'0.7rem',marginTop:'4px'},
   error:{background:'rgba(220,38,38,0.1)',border:'2px solid var(--danger)',color:'#fca5a5',padding:'10px 14px',fontFamily:'var(--font-mono)',fontSize:'0.78rem',borderRadius:'2px',marginBottom:'16px'},
   btns:{display:'flex',gap:'12px',justifyContent:'flex-end'},
-  btnCancel:{background:'transparent',border:'2px solid var(--border-dim)',color:'var(--text-muted)',padding:'10px 20px',fontFamily:'var(--font-mono)',fontSize:'0.75rem',fontWeight:'700',borderRadius:'2px',cursor:'pointer'},
+  btnCancel:{background:'transparent',border:'2px solid var(--border-dim)',color:'#ffffff',padding:'10px 20px',fontFamily:'var(--font-mono)',fontSize:'0.75rem',fontWeight:'700',borderRadius:'2px',cursor:'pointer'},
   btnConfirm:{background:'var(--accent)',border:'2px solid #000',color:'#000',padding:'10px 20px',fontFamily:'var(--font-display)',fontSize:'0.9rem',fontWeight:'700',borderRadius:'2px',boxShadow:'3px 3px 0 #000',cursor:'pointer'},
 };
 
@@ -110,7 +125,6 @@ const Registro = () => {
     setNumeroRollo('');
   };
 
-  // Referencias del pedido que AUN NO tienen registro activo o finalizado
   const getRefsDisponibles = () => {
     if (!planillaSeleccionada) return [];
     const refs = new Map();
@@ -131,7 +145,6 @@ const Registro = () => {
     return Array.from(refs.values());
   };
 
-  // Selladoras sin registro activo en este momento
   const getSelladrasDisponibles = () => {
     const ocupadas = new Set(registros.filter(r => r.estado === 'en_proceso').map(r => r.selladora));
     return [1,2,3,4,5].filter(n => !ocupadas.has(n));
@@ -155,18 +168,9 @@ const Registro = () => {
       setMsg('❌ Completa todos los campos'); return;
     }
     try {
-      await api.post('/registros', {
-        planilla: planillaSeleccionada._id,
-        selladora: Number(selladora),
-        referencia: referenciaSeleccionada,
-        numeroRollo
-      });
+      await api.post('/registros', { planilla: planillaSeleccionada._id, selladora: Number(selladora), referencia: referenciaSeleccionada, numeroRollo });
       setMsg('✅ Producción iniciada correctamente');
-      setPlanillaSeleccionada(null);
-      setReferenciaSeleccionada('');
-      setCantidadPedida(null);
-      setNumeroRollo('');
-      setSelladora('');
+      setPlanillaSeleccionada(null); setReferenciaSeleccionada(''); setCantidadPedida(null); setNumeroRollo(''); setSelladora('');
       cargar();
     } catch(err) { setMsg('❌ ' + (err.response?.data?.mensaje || 'Error')); }
   };
@@ -194,9 +198,7 @@ const Registro = () => {
 
   return (
     <div style={s.page}>
-      {modalRegistro && (
-        <Modal registro={modalRegistro} cantidadPedida={modalCantidadPedida} onConfirm={handleFinalizar} onCancel={() => setModalRegistro(null)}/>
-      )}
+      {modalRegistro && <Modal registro={modalRegistro} cantidadPedida={modalCantidadPedida} onConfirm={handleFinalizar} onCancel={() => setModalRegistro(null)}/>}
 
       <div style={s.header}>
         <div>
@@ -211,7 +213,6 @@ const Registro = () => {
       <div style={s.formCard}>
         <h3 style={s.formTitle}>INICIAR NUEVA PRODUCCIÓN</h3>
         <form onSubmit={handleIniciar} style={s.form}>
-
           <div style={s.step}>
             <span style={s.stepNum}>01</span>
             <div style={s.stepContent}>
@@ -231,7 +232,7 @@ const Registro = () => {
             <div style={s.step}>
               <span style={s.stepNum}>02</span>
               <div style={s.stepContent}>
-                <label style={s.label}>REFERENCIA A PRODUCIR (solo las pendientes del pedido)</label>
+                <label style={s.label}>REFERENCIA A PRODUCIR (solo pendientes del pedido)</label>
                 {refsDisponibles.length === 0
                   ? <div style={s.infoBox}>✓ Todas las referencias de esta planilla ya están en producción o finalizadas.</div>
                   : (
@@ -244,9 +245,7 @@ const Registro = () => {
                   )
                 }
                 {cantidadPedida && (
-                  <div style={s.infoBox}>
-                    📦 El pedido requiere <strong style={{color:'var(--accent)'}}>{cantidadPedida} bolsas</strong> de esta referencia
-                  </div>
+                  <div style={s.infoBox}>📦 El pedido requiere <strong style={{color:'var(--accent)'}}>{cantidadPedida} bolsas</strong> de esta referencia</div>
                 )}
               </div>
             </div>
@@ -259,7 +258,7 @@ const Registro = () => {
                 <div style={s.field}>
                   <label style={s.label}>SELLADORA DISPONIBLE</label>
                   {selladrasDisponibles.length === 0
-                    ? <div style={s.warning}>⚠ Todas las selladoras están en producción actualmente</div>
+                    ? <div style={s.warning}>⚠ Todas las selladoras están ocupadas</div>
                     : (
                       <select value={selladora} onChange={e => setSelladora(e.target.value)} required>
                         <option value="">Seleccionar...</option>
@@ -270,16 +269,14 @@ const Registro = () => {
                 </div>
                 <div style={s.field}>
                   <label style={s.label}>CÓDIGO DEL ROLLO</label>
-                  <input value={numeroRollo} onChange={e => setNumeroRollo(e.target.value)} placeholder="Escanea o escribe el código del rollo" required/>
+                  <input value={numeroRollo} onChange={e => setNumeroRollo(e.target.value)} placeholder="Escanea o escribe el código" required/>
                 </div>
               </div>
             </div>
           )}
 
           {referenciaSeleccionada && numeroRollo && selladora && (
-            <button type="submit" className="neo-btn-primary" style={{alignSelf:'flex-start',marginTop:'8px'}}>
-              ▶ INICIAR PRODUCCIÓN
-            </button>
+            <button type="submit" className="neo-btn-primary" style={{alignSelf:'flex-start',marginTop:'8px'}}>▶ INICIAR PRODUCCIÓN</button>
           )}
         </form>
       </div>
@@ -322,9 +319,9 @@ const s = {
   page:{padding:'40px',maxWidth:'1400px'},
   header:{marginBottom:'32px'},
   tag:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'var(--accent)',letterSpacing:'0.15em',display:'block',marginBottom:'6px'},
-  title:{fontFamily:'var(--font-display)',fontSize:'1.8rem',fontWeight:'700',letterSpacing:'0.08em'},
+  title:{fontFamily:'var(--font-display)',fontSize:'1.8rem',fontWeight:'700',letterSpacing:'0.08em',color:'#ffffff'},
   underline:{height:'3px',width:'40px',background:'var(--accent)',marginTop:'8px'},
-  msg:{padding:'12px 16px',border:'2px solid var(--border-dim)',background:'var(--bg-card)',fontFamily:'var(--font-mono)',fontSize:'0.8rem',color:'var(--text)',marginBottom:'20px',borderRadius:'2px'},
+  msg:{padding:'12px 16px',border:'2px solid var(--border-dim)',background:'var(--bg-card)',fontFamily:'var(--font-mono)',fontSize:'0.8rem',color:'#ffffff',marginBottom:'20px',borderRadius:'2px'},
   formCard:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'6px 6px 0 var(--border-dim)',padding:'28px',marginBottom:'32px',borderRadius:'2px'},
   formTitle:{fontFamily:'var(--font-mono)',fontSize:'0.8rem',color:'var(--accent)',letterSpacing:'0.15em',marginBottom:'24px'},
   form:{display:'flex',flexDirection:'column',gap:'20px'},
@@ -333,21 +330,21 @@ const s = {
   stepContent:{flex:1,display:'flex',flexDirection:'column',gap:'8px'},
   grid2:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'},
   field:{display:'flex',flexDirection:'column',gap:'6px'},
-  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.12em'},
-  infoBox:{background:'rgba(245,158,11,0.08)',border:'2px solid rgba(245,158,11,0.3)',borderRadius:'2px',padding:'12px 16px',fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'var(--text-secondary)',marginTop:'4px'},
+  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'#ffffff',letterSpacing:'0.12em',fontWeight:'600'},
+  infoBox:{background:'rgba(245,158,11,0.08)',border:'2px solid rgba(245,158,11,0.3)',borderRadius:'2px',padding:'12px 16px',fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'#ffffff',marginTop:'4px'},
   warning:{background:'rgba(220,38,38,0.08)',border:'2px solid rgba(220,38,38,0.3)',borderRadius:'2px',padding:'12px 16px',fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'#fca5a5'},
   section:{},
-  sectionTag:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'var(--text-muted)',letterSpacing:'0.15em',display:'block',marginBottom:'14px'},
+  sectionTag:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'#ffffff',letterSpacing:'0.15em',display:'block',marginBottom:'14px'},
   tableWrap:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'6px 6px 0 var(--border-dim)',borderRadius:'2px',overflow:'auto'},
   table:{width:'100%',borderCollapse:'collapse'},
   th:{padding:'12px 16px',textAlign:'left',fontFamily:'var(--font-mono)',fontSize:'0.62rem',color:'var(--accent)',letterSpacing:'0.1em',borderBottom:'2px solid var(--border-dim)',background:'#0d0f13',whiteSpace:'nowrap'},
   tr:{borderBottom:'1px solid var(--border-dim)'},
-  td:{padding:'12px 16px',color:'var(--text-secondary)',fontSize:'0.82rem',whiteSpace:'nowrap'},
-  tdMono:{padding:'12px 16px',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:'0.78rem',whiteSpace:'nowrap'},
+  td:{padding:'12px 16px',color:'#ffffff',fontSize:'0.82rem',whiteSpace:'nowrap'},
+  tdMono:{padding:'12px 16px',color:'#ffffff',fontFamily:'var(--font-mono)',fontSize:'0.78rem',whiteSpace:'nowrap'},
   tdAccent:{padding:'12px 16px',color:'var(--accent)',fontFamily:'var(--font-mono)',fontSize:'0.78rem',fontWeight:'700',whiteSpace:'nowrap'},
   finBtn:{background:'transparent',border:'2px solid var(--warning)',color:'var(--warning)',padding:'4px 12px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',fontWeight:'700',borderRadius:'2px',boxShadow:'2px 2px 0 var(--warning)',cursor:'pointer',whiteSpace:'nowrap'},
   doneIcon:{color:'var(--success)',fontFamily:'var(--font-mono)',fontSize:'0.72rem',fontWeight:'700'},
-  empty:{textAlign:'center',padding:'40px',color:'var(--text-muted)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
+  empty:{textAlign:'center',padding:'40px',color:'#ffffff',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
 };
 
 export default Registro;

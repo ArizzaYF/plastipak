@@ -138,7 +138,7 @@ const s = {
   form:{display:'flex',flexDirection:'column',gap:'20px'},
   grid3:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px'},
   field:{display:'flex',flexDirection:'column',gap:'6px'},
-  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.15em'},
+  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'#cccccc',letterSpacing:'0.15em'},
   itemsSection:{display:'flex',flexDirection:'column',gap:'12px'},
   itemsLabel:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'var(--accent)',letterSpacing:'0.15em'},
   itemRow:{display:'flex',gap:'12px',alignItems:'flex-end'},
@@ -146,10 +146,10 @@ const s = {
   table:{width:'100%',borderCollapse:'collapse'},
   th:{padding:'12px 16px',textAlign:'left',fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--accent)',letterSpacing:'0.12em',borderBottom:'2px solid var(--border-dim)',background:'#0d0f13'},
   tr:{borderBottom:'1px solid var(--border-dim)'},
-  td:{padding:'12px 16px',color:'var(--text-secondary)',fontSize:'0.88rem'},
+  td:{padding:'12px 16px',color:'#ffffff',fontSize:'0.88rem'},
   tdMono:{padding:'12px 16px',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
   estadoBadge:{border:'2px solid',padding:'2px 10px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',fontWeight:'700',letterSpacing:'0.1em',borderRadius:'2px'},
-  empty:{textAlign:'center',padding:'40px',color:'var(--text-muted)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
+  empty:{textAlign:'center',padding:'40px',color:'#cccccc',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
 };
 
 export default Pedidos;

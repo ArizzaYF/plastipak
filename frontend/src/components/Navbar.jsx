@@ -76,13 +76,13 @@ const s = {
   brandY: { color:'var(--accent)' },
   divider: { width:'2px', height:'24px', background:'var(--border-dim)', margin:'0 20px' },
   links: { display:'flex', alignItems:'center', gap:'2px' },
-  link: { fontFamily:'var(--font-mono)', fontSize:'0.68rem', letterSpacing:'0.12em', color:'var(--text-muted)', padding:'8px 14px', position:'relative', transition:'color 0.15s' },
+  link: { fontFamily:'var(--font-mono)', fontSize:'0.68rem', letterSpacing:'0.12em', color:'#cccccc', padding:'8px 14px', position:'relative', transition:'color 0.15s' },
   linkActive: { color:'var(--accent)' },
   activeBar: { position:'absolute', bottom:'-18px', left:'14px', right:'14px', height:'2px', background:'var(--accent)' },
   right: { display:'flex', alignItems:'center', gap:'16px' },
   userBox: { display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'2px' },
   rolBadge: { fontFamily:'var(--font-mono)', fontSize:'0.58rem', color:'var(--accent)', letterSpacing:'0.12em', border:'1px solid var(--accent)', padding:'1px 6px', borderRadius:'1px' },
-  userName: { fontFamily:'var(--font-mono)', fontSize:'0.72rem', color:'var(--text-secondary)' },
+  userName: { fontFamily:'var(--font-mono)', fontSize:'0.72rem', color:'#ffffff' },
   logoutBtn: { padding:'6px 14px', fontSize:'0.72rem' },
 };
 

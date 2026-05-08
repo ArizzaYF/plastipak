@@ -140,7 +140,7 @@ const Planillas = () => {
                             {ped.numeroPedido || `Pedido ${i+1}`}
                           </span>
                         ))
-                        : <span style={{color:'var(--text-muted)'}}>Sin pedidos</span>
+                        : <span style={{color:'#cccccc'}}>Sin pedidos</span>
                       }
                     </div>
                   </td>
@@ -172,24 +172,24 @@ const s = {
   form:{display:'flex',flexDirection:'column',gap:'20px'},
   grid3:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px'},
   field:{display:'flex',flexDirection:'column',gap:'8px'},
-  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--text-muted)',letterSpacing:'0.15em'},
+  label:{fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'#cccccc',letterSpacing:'0.15em'},
   pedidosList:{background:'#0d0f13',border:'2px solid var(--border-dim)',padding:'16px',display:'flex',flexDirection:'column',gap:'12px',borderRadius:'2px',maxHeight:'200px',overflowY:'auto'},
-  sinPedidos:{fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'var(--text-muted)',textAlign:'center',padding:'12px'},
+  sinPedidos:{fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'#cccccc',textAlign:'center',padding:'12px'},
   checkRow:{display:'flex',alignItems:'flex-start',gap:'12px',cursor:'pointer',padding:'8px',borderRadius:'2px'},
   checkInfo:{display:'flex',flexDirection:'column',gap:'4px'},
   checkCodigo:{fontFamily:'var(--font-mono)',fontSize:'0.78rem',color:'var(--accent)'},
-  checkDetalle:{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--text-muted)'},
+  checkDetalle:{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'#cccccc'},
   tableWrap:{background:'var(--bg-card)',border:'2px solid var(--border-dim)',boxShadow:'6px 6px 0 var(--border-dim)',borderRadius:'2px',overflow:'auto'},
   table:{width:'100%',borderCollapse:'collapse'},
   th:{padding:'14px 16px',textAlign:'left',fontFamily:'var(--font-mono)',fontSize:'0.65rem',color:'var(--accent)',letterSpacing:'0.12em',borderBottom:'2px solid var(--border-dim)',background:'#0d0f13',whiteSpace:'nowrap'},
   tr:{borderBottom:'1px solid var(--border-dim)'},
-  td:{padding:'14px 16px',color:'var(--text-secondary)',fontSize:'0.88rem'},
+  td:{padding:'14px 16px',color:'#ffffff',fontSize:'0.88rem'},
   tdMono:{padding:'14px 16px',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:'0.78rem'},
   tdDestacado:{padding:'14px 16px',color:'var(--accent)',fontFamily:'var(--font-display)',fontSize:'1rem',fontWeight:'700'},
   estadoBadge:{border:'2px solid',padding:'4px 10px',fontFamily:'var(--font-mono)',fontSize:'0.65rem',fontWeight:'700',letterSpacing:'0.1em',borderRadius:'2px',whiteSpace:'nowrap'},
   pedidosBadges:{display:'flex',flexDirection:'column',gap:'4px'},
-  pedidoBadge:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'var(--text-secondary)',background:'#0d0f13',border:'1px solid var(--border-dim)',padding:'2px 8px',borderRadius:'2px',display:'inline-block'},
-  empty:{textAlign:'center',padding:'40px',color:'var(--text-muted)',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
+  pedidoBadge:{fontFamily:'var(--font-mono)',fontSize:'0.68rem',color:'#ffffff',background:'#0d0f13',border:'1px solid var(--border-dim)',padding:'2px 8px',borderRadius:'2px',display:'inline-block'},
+  empty:{textAlign:'center',padding:'40px',color:'#cccccc',fontFamily:'var(--font-mono)',fontSize:'0.8rem'},
 };
 
 export default Planillas;
