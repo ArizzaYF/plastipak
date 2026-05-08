@@ -1,1 +1,3 @@
 # plastipak
+## Integrantes
+- Oscar Guillen
